@@ -23,7 +23,7 @@ public final class Email implements Serializable {
      * Regex volontairement simple et robuste (pas RFC complète).
      */
     private static final Pattern EMAIL_PATTERN =
-        Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+            Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 
     private final String value;
 

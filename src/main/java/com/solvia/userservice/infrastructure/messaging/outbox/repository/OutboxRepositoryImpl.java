@@ -48,13 +48,13 @@ public class OutboxRepositoryImpl implements OutboxRepository {
     @Transactional
     public void markAsPublished(UUID eventId) {
         int updated = jpaRepository.markAsPublished(
-            eventId,
-            Instant.now()
+                eventId,
+                Instant.now()
         );
 
         if (updated == 0) {
             throw new IllegalStateException(
-                "Outbox event not found or already processed: " + eventId
+                    "Outbox event not found or already processed: " + eventId
             );
         }
     }
@@ -65,13 +65,13 @@ public class OutboxRepositoryImpl implements OutboxRepository {
         Instant nextRetry = Instant.now().plusSeconds(30);
 
         int updated = jpaRepository.markAsFailed(
-            eventId,
-            nextRetry
+                eventId,
+                nextRetry
         );
 
         if (updated == 0) {
             throw new IllegalStateException(
-                "Outbox event not found or already processed: " + eventId
+                    "Outbox event not found or already processed: " + eventId
             );
         }
     }

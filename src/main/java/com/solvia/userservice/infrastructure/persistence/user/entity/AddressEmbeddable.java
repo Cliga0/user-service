@@ -28,10 +28,10 @@ public class AddressEmbeddable implements Serializable {
     }
 
     public AddressEmbeddable(
-        String street,
-        String city,
-        String country,
-        String postalCode
+            String street,
+            String city,
+            String country,
+            String postalCode
     ) {
         this.street = Objects.requireNonNull(street);
         this.city = Objects.requireNonNull(city);

@@ -5,6 +5,7 @@ import com.solvia.userservice.domain.authorization.AuthorizationRule;
 import com.solvia.userservice.domain.authorization.TupleRepository;
 import com.solvia.userservice.domain.authorization.rules.AdminRule;
 import com.solvia.userservice.domain.model.factory.UserFactory;
+import com.solvia.userservice.infrastructure.authorization.InMemoryTupleRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,5 +30,10 @@ public class DomainConfiguration {
     @Bean
     public AuthorizationRule adminRule() {
         return new AdminRule();
+    }
+
+    @Bean
+    public TupleRepository tupleRepository() {
+        return new InMemoryTupleRepository();
     }
 }

@@ -24,10 +24,4 @@ public class MessagingConfiguration {
     public DomainEventMapper domainEventMapper(ObjectMapper objectMapper) {
         return new DomainEventMapperImpl(objectMapper);
     }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper()
-                .findAndRegisterModules();
-    }
 }

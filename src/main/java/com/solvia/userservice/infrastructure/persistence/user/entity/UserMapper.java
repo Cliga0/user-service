@@ -41,7 +41,7 @@ public final class UserMapper {
 
         entity.setId(user.id().value());
         entity.setExternalAuthId(
-            user.externalAuthId() != null ? user.externalAuthId().value() : null
+                user.externalAuthId() != null ? user.externalAuthId().value() : null
         );
 
         entity.setFirstName(user.firstName().value());
@@ -53,9 +53,9 @@ public final class UserMapper {
         entity.setPhoneNumber(user.phoneNumber() != null ? user.phoneNumber().value() : null);
 
         entity.setAddresses(
-            user.addresses().stream()
-                .map(UserMapper::toEmbeddable)
-                .collect(Collectors.toList())
+                user.addresses().stream()
+                        .map(UserMapper::toEmbeddable)
+                        .collect(Collectors.toList())
         );
 
         entity.setRole(user.role().asString());
@@ -109,10 +109,10 @@ public final class UserMapper {
 
     private static AddressEmbeddable toEmbeddable(Address address) {
         return new AddressEmbeddable(
-            address.street().value(),
-            address.city().value(),
-            address.country().code(),
-            address.postalCode().value()
+                address.street().value(),
+                address.city().value(),
+                address.country().code(),
+                address.postalCode().value()
         );
     }
 
@@ -120,13 +120,13 @@ public final class UserMapper {
         if (list == null) return List.of();
 
         return list.stream()
-            .map(a -> Address.of(
-                Street.of(a.getStreet()),
-                City.of(a.getCity()),
-                PostalCode.of(a.getPostalCode()),
-                Country.of(a.getCountry())
-            ))
-            .collect(Collectors.toList());
+                .map(a -> Address.of(
+                        Street.of(a.getStreet()),
+                        City.of(a.getCity()),
+                        PostalCode.of(a.getPostalCode()),
+                        Country.of(a.getCountry())
+                ))
+                .collect(Collectors.toList());
     }
 
     // =========================
@@ -135,11 +135,11 @@ public final class UserMapper {
 
     private static UserMetadata mapMetadata(UserEntity entity) {
         return UserMetadata.rehydrate(
-            entity.getCreatedAt(),
-            entity.getUpdatedAt(),
-            ActorId.fromString(entity.getCreatedBy()),
-            ActorId.fromString(entity.getUpdatedBy()),
-            UserStatus.valueOf(entity.getStatus())
+                entity.getCreatedAt(),
+                entity.getUpdatedAt(),
+                ActorId.fromString(entity.getCreatedBy()),
+                ActorId.fromString(entity.getUpdatedBy()),
+                UserStatus.valueOf(entity.getStatus())
         );
     }
 }

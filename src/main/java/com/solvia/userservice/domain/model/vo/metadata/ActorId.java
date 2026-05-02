@@ -41,6 +41,10 @@ public final class ActorId implements Serializable {
         return new ActorId(userId.value());
     }
 
+    public static ActorId system() {
+        return new ActorId(SystemActors.SYSTEM.value());
+    }
+
     /**
      * Crée un ActorId à partir d'une String UUID.
      *

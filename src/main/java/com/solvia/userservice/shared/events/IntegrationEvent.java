@@ -24,14 +24,14 @@ public final class IntegrationEvent {
     private final Map<String, String> headers;
 
     public IntegrationEvent(
-        UUID eventId,
-        String eventType,
-        String aggregateId,
-        String tenantId,
-        String traceId,
-        String payload,
-        Instant occurredAt,
-        Map<String, String> headers
+            UUID eventId,
+            String eventType,
+            String aggregateId,
+            String tenantId,
+            String traceId,
+            String payload,
+            Instant occurredAt,
+            Map<String, String> headers
     ) {
         this.eventId = eventId;
         this.eventType = eventType;

@@ -1,6 +1,7 @@
 package com.solvia.userservice.application.port.out;
 
 import com.solvia.userservice.domain.model.aggregate.User;
+import com.solvia.userservice.domain.model.vo.contact.Email;
 import com.solvia.userservice.domain.model.vo.identity.UserId;
 
 import java.util.Optional;
@@ -25,6 +26,9 @@ public interface UserRepository {
      * Récupère un User par son identifiant métier.
      */
     Optional<User> findById(UserId id);
+
+
+    Optional<User> findByEmail(Email email);
 
     /**
      * Vérifie l’existence d’un User.

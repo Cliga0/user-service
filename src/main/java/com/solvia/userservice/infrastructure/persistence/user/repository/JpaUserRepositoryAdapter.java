@@ -2,26 +2,16 @@ package com.solvia.userservice.infrastructure.persistence.user.repository;
 
 import com.solvia.userservice.application.port.out.UserRepository;
 import com.solvia.userservice.domain.model.aggregate.User;
+import com.solvia.userservice.domain.model.vo.contact.Email;
 import com.solvia.userservice.domain.model.vo.identity.UserId;
 import com.solvia.userservice.infrastructure.persistence.user.entity.UserEntity;
 import com.solvia.userservice.infrastructure.persistence.user.entity.UserMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 
-/**
- * JpaUserRepositoryAdapter
- *
- * <p>
- * Implémentation DDD du repository User.
- *
- * <p>
- * - Bridge Domain ↔ Persistence
- * - Transaction boundary
- * - Mapping isolé
- * - Prêt pour scaling horizontal
- */
 @Repository
 @Transactional
 public class JpaUserRepositoryAdapter implements UserRepository {
@@ -44,14 +34,28 @@ public class JpaUserRepositoryAdapter implements UserRepository {
     }
 
     // =========================
-    // FIND
+    // FIND BY ID
     // =========================
 
     @Override
     @Transactional(readOnly = true)
     public Optional<User> findById(UserId id) {
         return jpaRepository.findById(id.value())
-            .map(UserMapper::toDomain);
+                .map(UserMapper::toDomain);
+    }
+
+    // =========================
+    // FIND BY EMAIL (🔥 MANQUANT)
+    // =========================
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<User> findByEmail(Email email) {
+
+        Objects.requireNonNull(email, "Email must not be null");
+
+        return jpaRepository.findByEmail(email.value())
+                .map(UserMapper::toDomain);
     }
 
     // =========================
@@ -63,6 +67,10 @@ public class JpaUserRepositoryAdapter implements UserRepository {
     public boolean existsById(UserId id) {
         return jpaRepository.existsById(id.value());
     }
+
+    // =========================
+    // DELETE
+    // =========================
 
     @Override
     public void delete(User user) {

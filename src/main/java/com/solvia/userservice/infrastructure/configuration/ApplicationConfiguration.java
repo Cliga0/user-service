@@ -1,14 +1,12 @@
 package com.solvia.userservice.infrastructure.configuration;
 
-import com.solvia.userservice.application.command.handler.CreateUserHandler;
-import com.solvia.userservice.application.port.in.CreateUserUseCase;
+import com.solvia.userservice.application.command.signup.handler.SignupUserHandler;
+import com.solvia.userservice.application.command.signup.result.SignupUserResultMapper;
+import com.solvia.userservice.application.port.in.SignupUserUseCase;
 import com.solvia.userservice.application.port.out.UserRepository;
 import com.solvia.userservice.application.port.out.auth.AuthenticatedUserProvider;
 import com.solvia.userservice.application.port.out.event.EventPublisher;
 import com.solvia.userservice.application.security.context.AuthenticatedUser;
-import com.solvia.userservice.application.security.service.AuthorizationAppService;
-import com.solvia.userservice.application.command.result.CreateUserResultMapper;
-import com.solvia.userservice.domain.authorization.AuthorizationEngine;
 import com.solvia.userservice.domain.model.factory.UserFactory;
 
 import com.solvia.userservice.domain.model.vo.business.UserRole;
@@ -19,31 +17,34 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Configuration
 public class ApplicationConfiguration {
 
+    // =====================================================
+    // SIGNUP USER (MISSING PART → FIX)
+    // =====================================================
+
     @Bean
-    public CreateUserUseCase createUserUseCase(
+    public SignupUserUseCase signupUserUseCase(
             UserRepository userRepository,
             EventPublisher eventPublisher,
             UserFactory userFactory,
-            AuthenticatedUserProvider authUserProvider,
-            AuthorizationAppService authorizationService,
-            CreateUserResultMapper resultMapper
+            SignupUserResultMapper resultMapper
     ) {
-        return new CreateUserHandler(
+        return new SignupUserHandler(
                 userRepository,
                 eventPublisher,
                 userFactory,
-                authUserProvider,
-                authorizationService,
                 resultMapper
         );
     }
+
+    // =====================================================
+    // AUTHENTICATED USER PROVIDER
+    // =====================================================
 
     @Bean
     public AuthenticatedUserProvider authenticatedUserProvider() {
@@ -69,25 +70,21 @@ public class ApplicationConfiguration {
                     .map(UserRole::of)
                     .collect(Collectors.toSet());
 
-            return Optional.of(
-                    AuthenticatedUser.of(
+            return AuthenticatedUser.of(
                             UserId.fromString(jwt.getSubject()),
                             TenantId.fromString(jwt.getClaimAsString("org_id")),
                             mappedRoles
-                    )
+
             );
         };
     }
 
-    @Bean
-    public AuthorizationAppService authorizationAppService(
-            AuthorizationEngine engine
-    ) {
-        return new AuthorizationAppService(engine);
-    }
+    // =====================================================
+    // MAPPERS
+    // =====================================================
 
     @Bean
-    public CreateUserResultMapper createUserResultMapper() {
-        return new CreateUserResultMapper();
+    public SignupUserResultMapper signupUserResultMapper() {
+        return new SignupUserResultMapper();
     }
 }

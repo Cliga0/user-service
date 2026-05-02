@@ -33,7 +33,7 @@ import java.util.UUID;
  * Toute entité persistée DOIT être rattachée à un TenantId.
  */
 public final class TenantId
-    implements Serializable, Comparable<TenantId> {
+        implements Serializable, Comparable<TenantId> {
 
     @Serial
     private static final long serialVersionUID = 1L;

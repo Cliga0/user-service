@@ -9,15 +9,15 @@ public final class OutboxEventFactory {
 
     public static OutboxEventEntity from(IntegrationEvent event) {
         return OutboxEventEntity.pending(
-            "USER",
-            event.aggregateId(),
-            event.eventType(),
-            "v1",
-            event.tenantId(),
-            event.traceId(),
-            event.occurredAt(),
-            event.payload(),
-            null
+                "USER",
+                event.aggregateId(),
+                event.eventType(),
+                "v1",
+                event.tenantId(),
+                event.traceId(),
+                event.occurredAt(),
+                event.payload(),
+                null
         );
     }
 }

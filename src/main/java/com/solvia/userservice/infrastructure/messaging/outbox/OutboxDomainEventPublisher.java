@@ -15,8 +15,8 @@ public class OutboxDomainEventPublisher implements EventPublisher {
     private final DomainEventMapper mapper;
 
     public OutboxDomainEventPublisher(
-        OutboxRepository repository,
-        DomainEventMapper mapper
+            OutboxRepository repository,
+            DomainEventMapper mapper
     ) {
         this.repository = Objects.requireNonNull(repository);
         this.mapper = Objects.requireNonNull(mapper);
@@ -32,7 +32,7 @@ public class OutboxDomainEventPublisher implements EventPublisher {
             IntegrationEvent integrationEvent = mapper.map(domainEvent);
 
             OutboxEventEntity entity =
-                OutboxEventFactory.from(integrationEvent);
+                    OutboxEventFactory.from(integrationEvent);
 
             repository.save(entity);
         }

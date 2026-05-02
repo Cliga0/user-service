@@ -36,10 +36,13 @@ public final class UserFactory {
             ActorId actorId
     ) {
         Objects.requireNonNull(userId);
+        Objects.requireNonNull(externalAuthId);
         Objects.requireNonNull(firstName);
         Objects.requireNonNull(lastName);
         Objects.requireNonNull(birthDate);
         Objects.requireNonNull(gender);
+        Objects.requireNonNull(email);
+        Objects.requireNonNull(phoneNumber);
         Objects.requireNonNull(role);
         Objects.requireNonNull(actorId);
 

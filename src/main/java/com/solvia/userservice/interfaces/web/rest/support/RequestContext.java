@@ -1,5 +1,8 @@
 package com.solvia.userservice.interfaces.web.rest.support;
 
+import com.solvia.userservice.domain.model.vo.metadata.ActorId;
+import com.solvia.userservice.shared.TenantId;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
@@ -8,110 +11,115 @@ import java.util.UUID;
  * RequestContext
  * <p>
  * IMMUTABLE REQUEST SNAPSHOT
- * <p>
- * RESPONSIBILITIES:
- * - carry request identity metadata
- * - provide observability context
- * - define execution boundary identity
- * <p>
- * NON RESPONSIBILITIES:
- * - no business logic
- * - no framework dependency
- * - no lazy resolution
  */
 public final class RequestContext implements Serializable {
 
     // =========================
-    // CORE IDENTITY (MANDATORY)
+    // ACTOR
     // =========================
 
-    private final UUID actorId;
+    private final ActorId actorId;
+
+    private final ActorType actorType;
 
     // =========================
-    // OBSERVABILITY (ALWAYS PRESENT)
+    // OBSERVABILITY
     // =========================
 
     private final UUID correlationId;
 
     // =========================
-    // MULTI-TENANCY (OPTIONAL BUT NORMALIZED)
+    // TENANT
     // =========================
 
-    private final String tenantId;
+    private final TenantId tenantId;
 
     // =========================
-    // CONSTRUCTOR (STRICT)
+    // CONSTRUCTOR
     // =========================
 
     private RequestContext(
-            UUID actorId,
+            ActorId actorId,
+            ActorType actorType,
             UUID correlationId,
-            String tenantId
+            TenantId tenantId
     ) {
-        this.actorId = Objects.requireNonNull(actorId, "actorId must not be null");
-        this.correlationId = Objects.requireNonNull(correlationId, "correlationId must not be null");
-        this.tenantId = tenantId;
+        this.actorId = Objects.requireNonNull(actorId);
+        this.actorType = Objects.requireNonNull(actorType);
+        this.correlationId = Objects.requireNonNull(correlationId);
+        this.tenantId = Objects.requireNonNull(tenantId);
     }
 
     // =========================
-    // FACTORY (SINGLE ENTRY POINT)
+    // FACTORY AUTHENTICATED
     // =========================
 
-    public static RequestContext of(
-            UUID actorId,
+    public static RequestContext authenticated(
+            ActorId actorId,
             UUID correlationId,
-            String tenantId
+            TenantId tenantId
     ) {
         return new RequestContext(
                 actorId,
+                ActorType.AUTHENTICATED,
                 correlationId,
-                normalizeTenant(tenantId)
+                tenantId
         );
     }
 
     // =========================
-    // DEFAULT FACTORY (SAFE)
+    // FACTORY SYSTEM
     // =========================
 
-    public static RequestContext of(UUID actorId, UUID correlationId) {
-        return of(actorId, correlationId, null);
+    public static RequestContext system(UUID correlationId) {
+        return new RequestContext(
+                ActorId.system(),
+                ActorType.SYSTEM,
+                correlationId,
+                TenantId.of(UUID.fromString("00000000-0000-0000-0000-000000000000"))
+        );
     }
 
     // =========================
-    // NORMALIZATION
+    // FACTORY ANONYMOUS
     // =========================
 
-    private static String normalizeTenant(String tenantId) {
-        if (tenantId == null || tenantId.isBlank()) {
-            return "default-tenant";
-        }
-        return tenantId.trim();
+    public static RequestContext anonymous(UUID correlationId) {
+        return new RequestContext(
+                ActorId.of(UUID.fromString("00000000-0000-0000-0000-000000000000")),
+                ActorType.ANONYMOUS,
+                correlationId,
+                TenantId.of(UUID.fromString("00000000-0000-0000-0000-000000000000"))
+        );
     }
 
     // =========================
-    // ACCESSORS
+    // GETTERS
     // =========================
 
-    public UUID actorId() { return actorId; }
+    public ActorId actorId() {
+        return actorId;
+    }
+
+    public ActorType actorType() {
+        return actorType;
+    }
 
     public UUID correlationId() {
         return correlationId;
     }
 
-    public String tenantId() {
+    public TenantId tenantId() {
         return tenantId;
     }
-
-    // =========================
-    // DEBUG / OBSERVABILITY
-    // =========================
 
     @Override
     public String toString() {
         return "RequestContext{" +
                 "actorId=" + actorId +
+                ", actorType=" + actorType +
                 ", correlationId=" + correlationId +
-                ", tenantId='" + tenantId + '\'' +
+                ", tenantId=" + tenantId +
                 '}';
     }
 }

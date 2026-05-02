@@ -85,19 +85,19 @@ public class User implements Serializable {
     // =========================
 
     private User(
-        UserId id,
-        ExternalAuthId externalAuthId,
-        FirstName firstName,
-        LastName lastName,
-        BirthDate birthDate,
-        Gender gender,
-        Email email,
-        PhoneNumber phoneNumber,
-        List<Address> addresses,
-        UserRole role,
-        AccountBalance balance,
-        LoyaltyPoints loyaltyPoints,
-        UserMetadata metadata
+            UserId id,
+            ExternalAuthId externalAuthId,
+            FirstName firstName,
+            LastName lastName,
+            BirthDate birthDate,
+            Gender gender,
+            Email email,
+            PhoneNumber phoneNumber,
+            List<Address> addresses,
+            UserRole role,
+            AccountBalance balance,
+            LoyaltyPoints loyaltyPoints,
+            UserMetadata metadata
     ) {
         this.id = Objects.requireNonNull(id);
         this.externalAuthId = externalAuthId;
@@ -107,8 +107,8 @@ public class User implements Serializable {
         this.birthDate = Objects.requireNonNull(birthDate);
         this.gender = Objects.requireNonNull(gender);
 
-        this.email = email;
-        this.phoneNumber = phoneNumber;
+        this.email = Objects.requireNonNull(email);
+        this.phoneNumber = Objects.requireNonNull(phoneNumber);
 
         this.addresses = addresses == null ? new ArrayList<>() : new ArrayList<>(addresses);
 
@@ -126,128 +126,81 @@ public class User implements Serializable {
     // =========================
 
     public static User create(
-        UserId id,
-        ExternalAuthId externalAuthId,
-        FirstName firstName,
-        LastName lastName,
-        BirthDate birthDate,
-        Gender gender,
-        Email email,
-        PhoneNumber phoneNumber,
-        UserRole role,
-        ActorId actor
+            UserId id,
+            ExternalAuthId externalAuthId,
+            FirstName firstName,
+            LastName lastName,
+            BirthDate birthDate,
+            Gender gender,
+            Email email,
+            PhoneNumber phoneNumber,
+            UserRole role,
+            ActorId actor
     ) {
 
         User user = new User(
-            id,
-            externalAuthId,
-            firstName,
-            lastName,
-            birthDate,
-            gender,
-            email,
-            phoneNumber,
-            List.of(),
-            role,
-            AccountBalance.zero(),
-            LoyaltyPoints.zero(),
-            UserMetadata.create(actor)
+                id,
+                externalAuthId,
+                firstName,
+                lastName,
+                birthDate,
+                gender,
+                email,
+                phoneNumber,
+                List.of(),
+                role,
+                AccountBalance.zero(),
+                LoyaltyPoints.zero(),
+                UserMetadata.create(actor)
         );
 
         user.record(
-            UserCreatedEvent.of(
-                EventMetadataFactory.now(actor),
-                id,
-                email,
-                user.metadata.status()
-            )
+                UserCreatedEvent.of(
+                        EventMetadataFactory.now(actor),
+                        id,
+                        email,
+                        user.metadata.status()
+                )
         );
 
         return user;
     }
 
     public static User rehydrate(
-        UserId id,
-        ExternalAuthId externalAuthId,
-        FirstName firstName,
-        LastName lastName,
-        BirthDate birthDate,
-        Gender gender,
-        Email email,
-        PhoneNumber phoneNumber,
-        List<Address> addresses,
-        UserRole role,
-        AccountBalance balance,
-        LoyaltyPoints loyaltyPoints,
-        UserMetadata metadata
+            UserId id,
+            ExternalAuthId externalAuthId,
+            FirstName firstName,
+            LastName lastName,
+            BirthDate birthDate,
+            Gender gender,
+            Email email,
+            PhoneNumber phoneNumber,
+            List<Address> addresses,
+            UserRole role,
+            AccountBalance balance,
+            LoyaltyPoints loyaltyPoints,
+            UserMetadata metadata
     ) {
         return new User(
-            id,
-            externalAuthId,
-            firstName,
-            lastName,
-            birthDate,
-            gender,
-            email,
-            phoneNumber,
-            addresses,
-            role,
-            balance,
-            loyaltyPoints,
-            metadata
+                id,
+                externalAuthId,
+                firstName,
+                lastName,
+                birthDate,
+                gender,
+                email,
+                phoneNumber,
+                addresses,
+                role,
+                balance,
+                loyaltyPoints,
+                metadata
         );
     }
 
     // =========================
     // BUSINESS METHODS
     // =========================
-
-    public void changeEmail(Email newEmail, ActorId actor) {
-
-        if (Objects.equals(this.email, newEmail)) return;
-
-        Email old = this.email;
-        this.email = newEmail;
-
-        touch(actor);
-
-        record(UserEmailChangedEvent.of(
-            EventMetadataFactory.now(actor),
-            this.id,
-            old,
-            newEmail
-        ));
-    }
-
-    public void addLoyaltyPoints(int points, LoyaltyPointsReason reason, ActorId actor) {
-
-        this.loyaltyPoints = this.loyaltyPoints.add(points);
-
-        touch(actor);
-
-        record(LoyaltyPointsAddedEvent.of(
-            EventMetadataFactory.now(actor),
-            this.id,
-            points,
-            this.loyaltyPoints.value(),
-            reason
-        ));
-    }
-
-    public void suspend(SuspensionReason reason, Instant until, ActorId actor) {
-
-        this.metadata = metadata.changeStatus(UserStatus.SUSPENDED, actor);
-
-        touch(actor);
-
-        record(UserSuspendedEvent.of(
-            EventMetadataFactory.now(actor),
-            this.id,
-            reason,
-            until
-        ));
-    }
-
 
     public void activate(ActorId actor) {
         this.metadata = metadata.changeStatus(UserStatus.ACTIVE, actor);

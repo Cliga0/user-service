@@ -28,9 +28,9 @@ public final class SystemActors {
 
     // Mapping interne pour lookup rapide par nom
     private static final Map<String, ActorId> ACTOR_MAP = Map.of(
-        "SYSTEM", SYSTEM,
-        "SCHEDULER", SCHEDULER,
-        "INTEGRATION_SERVICE", INTEGRATION_SERVICE
+            "SYSTEM", SYSTEM,
+            "SCHEDULER", SCHEDULER,
+            "INTEGRATION_SERVICE", INTEGRATION_SERVICE
     );
 
     // ──────────────── Méthodes publiques ──────────────────────

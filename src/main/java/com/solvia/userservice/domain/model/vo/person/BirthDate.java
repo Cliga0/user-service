@@ -74,6 +74,9 @@ public final class BirthDate implements Serializable {
         return age() >= adultAge;
     }
 
+    public String iso() {
+        return value.toString();
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

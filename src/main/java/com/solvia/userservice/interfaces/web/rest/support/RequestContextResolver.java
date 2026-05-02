@@ -2,24 +2,26 @@ package com.solvia.userservice.interfaces.web.rest.support;
 
 import com.solvia.userservice.application.port.out.auth.AuthenticatedUserProvider;
 import com.solvia.userservice.application.security.context.AuthenticatedUser;
-import com.solvia.userservice.domain.model.vo.metadata.SystemActors;
+import com.solvia.userservice.domain.model.vo.metadata.ActorId;
+import com.solvia.userservice.shared.TenantId;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
  * RequestContextResolver
  * <p>
- * EDGE CONTEXT BUILDER
+ * EDGE CONTEXT BUILDER — FAANG GRADE
  * <p>
  * RESPONSIBILITIES:
  * - Build deterministic request context
  * - Aggregate security + request metadata
+ * - Provide SAFE fallback (never break request flow)
  * <p>
- * NON RESPONSIBILITIES:
- * - no business logic
- * - no domain mapping
+ * DESIGN:
+ * - DDD compliant
+ * - Fail-safe for public endpoints
+ * - Ready for multi-tenant & distributed tracing
  */
 public final class RequestContextResolver {
 
@@ -29,21 +31,48 @@ public final class RequestContextResolver {
         this.authUserProvider = Objects.requireNonNull(authUserProvider);
     }
 
+    // =====================================================
+    // ENTRY POINT
+    // =====================================================
+
     public RequestContext resolve() {
 
-        Optional<AuthenticatedUser> userOpt = authUserProvider.current();
-
-        UUID actorId = userOpt
-                .map(u -> u.userId().value())
-                .orElseGet(this::systemActorId);
-
-        String tenantId = userOpt
-                .map(this::resolveTenantId)
-                .orElse("default-tenant");
+        AuthenticatedUser user = safeUser();
 
         UUID correlationId = resolveCorrelationId();
 
-        return RequestContext.of(
+        if (user == null) {
+            return RequestContext.anonymous(correlationId);
+        }
+
+        return buildAuthenticated(user, correlationId);
+    }
+
+    // =====================================================
+    // SAFE USER RESOLUTION
+    // =====================================================
+
+    private AuthenticatedUser safeUser() {
+        try {
+            return authUserProvider.current();
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    // =====================================================
+    // AUTHENTICATED FLOW
+    // =====================================================
+
+    private RequestContext buildAuthenticated(
+            AuthenticatedUser user,
+            UUID correlationId
+    ) {
+        ActorId actorId = ActorId.of(user.userId());
+
+        TenantId tenantId = resolveTenant(user);
+
+        return RequestContext.authenticated(
                 actorId,
                 correlationId,
                 tenantId
@@ -51,11 +80,11 @@ public final class RequestContextResolver {
     }
 
     // =====================================================
-    // SYSTEM ACTOR (CRITICAL)
+    // TENANT RESOLUTION (EXTENSIBLE)
     // =====================================================
 
-    private UUID systemActorId() {
-        return SystemActors.SYSTEM.value();
+    private TenantId resolveTenant(AuthenticatedUser user) {
+        return user.tenantId();
     }
 
     // =====================================================
@@ -63,14 +92,6 @@ public final class RequestContextResolver {
     // =====================================================
 
     private UUID resolveCorrelationId() {
-        return UUID.randomUUID(); // next step: MDC / header propagation
-    }
-
-    // =====================================================
-    // TENANT RESOLUTION
-    // =====================================================
-
-    private String resolveTenantId(AuthenticatedUser user) {
-        return "default-tenant";
+        return UUID.randomUUID();
     }
 }
