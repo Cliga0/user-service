@@ -2,12 +2,12 @@ POST http://localhost:8080/api/v1/auth/signup
 Content-Type: application/json
 
 {
-  "externalAuthId": "auth-12345",
-  "email": "john.doe@email.com",
+  "externalAuthId": "auth-12845",
+  "email": "aser.chance@email.com",
   "firstName": "John",
   "lastName": "Doe",
   "password": "StrongPass123!",
   "birthDate": "1995-06-15",
   "gender": "MALE",
-  "phoneNumber": "+243999888777"
+  "phoneNumber": "+243999889777"
 }
